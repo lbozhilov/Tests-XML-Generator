@@ -138,8 +138,8 @@ namespace TestsRunner
                             trvit.Items.Add(new System.Windows.Controls.CheckBox
                             {
                                 FontStyle = FontStyles.Italic,
-                                Foreground = new SolidColorBrush(Colors.Orange),
-                                Content = item.Key[0]
+                                Foreground = new SolidColorBrush(Colors.Red),
+                                Content = item.Key[0] + " (Critical)"
                             });
                         }
                         else
@@ -159,8 +159,8 @@ namespace TestsRunner
                 treeviewitem.Items.Add(new System.Windows.Controls.CheckBox
                 {
                     FontStyle = FontStyles.Italic,
-                    Foreground = new SolidColorBrush(Colors.Orange),
-                    Content = itemKey[0]
+                    Foreground = new SolidColorBrush(Colors.Red),
+                    Content = itemKey[0] + " (Critical)"
                 });
             }
             else
