@@ -272,8 +272,9 @@ namespace TestsRunner
             }
 
             //TOD - copy file in the Project folder
-
-            xmlDoc.Save("Tests.xml");
+            Copy();
+            
+            xmlDoc.Save(@"Project\Tests.xml");
             textBox2.AppendText("New document created \n");
             
             a.Content = null;
@@ -286,14 +287,26 @@ namespace TestsRunner
             nodes.Clear();
         }
 
-        public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
+        public void Copy()
         {
-            DirectoryInfo proj = Directory.CreateDirectory("Project");
-            string projPath = Path.GetDirectoryName("Project");
+            if (Directory.Exists("Project"))
+            {
+                Directory.Delete("Project", true);
+            }
+            System.Windows.Forms.MessageBox.Show("Select Selenium Tests Bin/Release or Bin/Deubg folder!");
+            FolderBrowserDialog dlg = new FolderBrowserDialog();
+            dlg.ShowDialog();
+            string path = dlg.SelectedPath;
 
-            
+            DirectoryInfo dest = Directory.CreateDirectory("Project");
+            DirectoryInfo source = new DirectoryInfo(path);
+            copyAll(source,dest);
+        }
+
+        public void copyAll(DirectoryInfo source, DirectoryInfo target)
+        {
             foreach (DirectoryInfo dir in source.GetDirectories())
-                CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
+                copyAll(dir, target.CreateSubdirectory(dir.Name));
             foreach (FileInfo file in source.GetFiles())
                 file.CopyTo(Path.Combine(target.FullName, file.Name));
         }

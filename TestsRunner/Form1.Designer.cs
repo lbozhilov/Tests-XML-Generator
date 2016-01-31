@@ -48,11 +48,11 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(31, 46);
+            this.button3.Location = new System.Drawing.Point(13, 46);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(106, 23);
+            this.button3.Size = new System.Drawing.Size(161, 23);
             this.button3.TabIndex = 3;
-            this.button3.Text = "Create XML";
+            this.button3.Text = "Copy Project and create XML";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
