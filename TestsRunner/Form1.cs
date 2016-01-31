@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -43,7 +44,7 @@ namespace TestsRunner
                 }
                 if (!String.IsNullOrEmpty(filename))
                 {
-                    textBox2.AppendText("Document '" + filename + "' Loaded \n");
+                    WriteConsole("Document '" + filename + "' Loaded \n");
                 }
             }
         }
@@ -186,7 +187,7 @@ namespace TestsRunner
                 }
                 
             }
-            textBox2.AppendText(selectedCases.Count + " Cases Added for Running \n");
+            WriteConsole(selectedCases.Count + " Cases Added for Running \n");
             button4_Click(sender, e);
         }
 
@@ -202,7 +203,7 @@ namespace TestsRunner
             treeV.Items.Clear();
             nodes.Clear();
             selectedCases.Clear();
-            textBox2.AppendText("Cases Window closed! \n");
+            WriteConsole("Cases Window closed! \n");
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -219,72 +220,105 @@ namespace TestsRunner
                 treeV.Items.Clear();
                 nodes.Clear();
                 selectedCases.Clear();
-                textBox2.AppendText("Path cleared \n");
+                WriteConsole("Path cleared \n");
             }
             else
             {
-                textBox2.AppendText("Path already cleared \n");
+                WriteConsole("Path already cleared \n");
             }
         }
         
         private void button3_Click(object sender, EventArgs e)
         {
-            foreach (XmlNode xmln in xnList)
+            if (button3.Text.Equals("Run Tests"))
             {
-                foreach (string item in selectedCases)
-                {
-                    if (xmln["Name"].InnerText.Equals(item))
-                    {
-                        nodes.Add(xmln);
-                    }
-                }               
+                WriteConsole("Starting automation cases");
+                RunTests();
+                WriteConsole("Finish");
+                button3.Text = "Copy Project and create XML";
             }
-
-            XmlDocument xmlDoc = new XmlDocument();
-            XmlNode testsNode = xmlDoc.CreateElement("Tests");
-            xmlDoc.AppendChild(testsNode);
-            XmlNode readyToRunNode = xmlDoc.CreateElement("readyToRun");
-            testsNode.AppendChild(readyToRunNode);
-            foreach (XmlNode xmln in nodes)
+            else
             {
+                foreach (XmlNode xmln in xnList)
+                {
+                    foreach (string item in selectedCases)
+                    {
+                        if (xmln["Name"].InnerText.Equals(item))
+                        {
+                            nodes.Add(xmln);
+                        }
+                    }
+                }
+
+                XmlDocument xmlDoc = new XmlDocument();
+                XmlNode testsNode = xmlDoc.CreateElement("Tests");
+                xmlDoc.AppendChild(testsNode);
+                XmlNode readyToRunNode = xmlDoc.CreateElement("readyToRun");
+                testsNode.AppendChild(readyToRunNode);
+                foreach (XmlNode xmln in nodes)
+                {
+                    try
+                    {
+                        XmlNode import = xmlDoc.ImportNode(xmln, true);
+                        readyToRunNode.AppendChild(import);
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteConsole("Exception orccured while importing the xml nodes : " + ex.Message + "\n");
+                    }
+
+                }
                 try
                 {
-                    XmlNode import = xmlDoc.ImportNode(xmln,true);
-                    readyToRunNode.AppendChild(import);
+                    if (File.Exists("Tests.xml"))
+                    {
+                        WriteConsole("Deleting old document \n");
+                        File.Delete("Tests.xml");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    textBox2.AppendText("Exception orccured while importing the xml nodes : " + ex.Message + "\n" );
+                    WriteConsole("Exception orccured  while saving the xml file : " + ex.Message + "\n");
                 }
-                
+
+                Copy();
+
+                xmlDoc.Save(@"Project\Documents\Tests.xml");
+                WriteConsole("New document created \n");
+
+                a.Content = null;
+                stackPanel.Children.Clear();
+                selectedCases.Clear();
+                path = "";
+                list.Clear();
+                label1.Text = "";
+                treeV.Items.Clear();
+                nodes.Clear();
+
+                button3.Text = "Run Tests";
             }
+        }
+
+        public void RunTests()
+        {
+            string exePath = null;
             try
             {
-                if (File.Exists("Tests.xml"))
+                foreach (string command in Directory.GetFiles("Project", "SeleniumTest.exe"))
                 {
-                    textBox2.AppendText("Deleting old document \n");
-                    File.Delete("Tests.xml");
+                    exePath = command;
                 }
             }
             catch (Exception ex)
             {
-                textBox2.AppendText("Exception orccured  while saving the xml file : " + ex.Message + "\n");
+                System.Windows.Forms.MessageBox.Show(ex.Message);
             }
 
-            //TOD - copy file in the Project folder
-            Copy();
-            
-            xmlDoc.Save(@"Project\Tests.xml");
-            textBox2.AppendText("New document created \n");
-            
-            a.Content = null;
-            stackPanel.Children.Clear();
-            selectedCases.Clear();
-            path = "";
-            list.Clear();
-            label1.Text = "";
-            treeV.Items.Clear();
-            nodes.Clear();
+            if (!String.IsNullOrEmpty(exePath))
+            {
+                using (Process process = Process.Start(exePath))
+                    process.WaitForExit();
+            }
         }
 
         public void Copy()
@@ -305,10 +339,17 @@ namespace TestsRunner
 
         public void copyAll(DirectoryInfo source, DirectoryInfo target)
         {
+            WriteConsole("Starting copy of the directory");
             foreach (DirectoryInfo dir in source.GetDirectories())
                 copyAll(dir, target.CreateSubdirectory(dir.Name));
             foreach (FileInfo file in source.GetFiles())
                 file.CopyTo(Path.Combine(target.FullName, file.Name));
+            WriteConsole("Directory copied");
+        }
+
+        public void WriteConsole(string text)
+        {
+            textBox2.AppendText(text + "\n");
         }
     }
 }
