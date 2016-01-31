@@ -270,6 +270,9 @@ namespace TestsRunner
             {
                 textBox2.AppendText("Exception orccured  while saving the xml file : " + ex.Message + "\n");
             }
+
+            //TOD - copy file in the Project folder
+
             xmlDoc.Save("Tests.xml");
             textBox2.AppendText("New document created \n");
             
@@ -281,6 +284,18 @@ namespace TestsRunner
             label1.Text = "";
             treeV.Items.Clear();
             nodes.Clear();
+        }
+
+        public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
+        {
+            DirectoryInfo proj = Directory.CreateDirectory("Project");
+            string projPath = Path.GetDirectoryName("Project");
+
+            
+            foreach (DirectoryInfo dir in source.GetDirectories())
+                CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
+            foreach (FileInfo file in source.GetFiles())
+                file.CopyTo(Path.Combine(target.FullName, file.Name));
         }
     }
 }
