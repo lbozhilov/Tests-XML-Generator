@@ -23,6 +23,7 @@ namespace TestsRunner
         List<XmlNode> nodes = new List<XmlNode>();
         Window win = null;
         Dictionary <string[],string> list = new Dictionary<string[],string>();
+        
 
         public Form1()
         {
@@ -189,6 +190,7 @@ namespace TestsRunner
             }
             WriteConsole(selectedCases.Count + " Cases Added for Running \n");
             button4_Click(sender, e);
+            button3.Enabled = true;
         }
 
         private void onClosing(object sender, RoutedEventArgs e)
