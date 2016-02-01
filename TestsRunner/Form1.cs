@@ -60,6 +60,8 @@ namespace TestsRunner
                 xnList = xml.SelectNodes(criteria);
                 foreach (XmlNode xmln in xnList)
                 {
+                    xmln.Attributes[1].Value = "Y";
+
                     string[] toAdd = new string[2];
                     if (xmln.OuterXml.Contains("critical=\"Y\""))
                     {
@@ -141,7 +143,7 @@ namespace TestsRunner
                             {
                                 FontStyle = FontStyles.Italic,
                                 Foreground = new SolidColorBrush(Colors.Red),
-                                Content = item.Key[0] + " (Critical)"
+                                Content = item.Key[0]
                             });
                         }
                         else
@@ -162,7 +164,7 @@ namespace TestsRunner
                 {
                     FontStyle = FontStyles.Italic,
                     Foreground = new SolidColorBrush(Colors.Red),
-                    Content = itemKey[0] + " (Critical)"
+                    Content = itemKey[0]
                 });
             }
             else
@@ -189,8 +191,21 @@ namespace TestsRunner
                 
             }
             WriteConsole(selectedCases.Count + " Cases Added for Running \n");
-            button4_Click(sender, e);
+            CloseWindow();
             button3.Enabled = true;
+        }
+
+        private void CloseWindow()
+        {
+            win.Close();
+            a.Close();
+            a.Content = null;
+            stackPanel.Children.Clear();
+            path = "";
+            list.Clear();
+            label1.Text = "";
+            treeV.Items.Clear();
+            nodes.Clear();
         }
 
         private void onClosing(object sender, RoutedEventArgs e)
@@ -232,6 +247,8 @@ namespace TestsRunner
         
         private void button3_Click(object sender, EventArgs e)
         {
+            string xmlPath = @"Project\Documents\Tests.xml";
+
             if (button3.Text.Equals("Run Tests"))
             {
                 WriteConsole("Starting automation cases");
@@ -270,22 +287,13 @@ namespace TestsRunner
                     }
 
                 }
-                try
-                {
-                    if (File.Exists("Tests.xml"))
-                    {
-                        WriteConsole("Deleting old document \n");
-                        File.Delete("Tests.xml");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    WriteConsole("Exception orccured  while saving the xml file : " + ex.Message + "\n");
-                }
-
+                
                 Copy();
-
-                xmlDoc.Save(@"Project\Documents\Tests.xml");
+                if (File.Exists(xmlPath))
+                {
+                    File.Delete(xmlPath);
+                }
+                xmlDoc.Save(xmlPath);
                 WriteConsole("New document created \n");
 
                 a.Content = null;
@@ -318,8 +326,10 @@ namespace TestsRunner
 
             if (!String.IsNullOrEmpty(exePath))
             {
-                using (Process process = Process.Start(exePath))
+                using (Process process = Process.Start(exePath,"Firefox 1 5"))
+                {
                     process.WaitForExit();
+                }
             }
         }
 
