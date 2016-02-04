@@ -28,28 +28,22 @@ namespace TestsRunner
         public Form1()
         {
             InitializeComponent();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            string filename = "";
-            dlg.DefaultExt = ".xml";
-            Nullable<DialogResult> result = dlg.ShowDialog();
-            if (!result.HasValue.Equals(null))
+            try
             {
-                path = dlg.FileName;
-                label1.Text = path;
-                if (dlg.CheckPathExists)
-                {
-                    filename = Path.GetFileName(path);
-                }
+                string filename = Path.GetFileName("Tests.xml");
+                string fullPath = Path.GetFullPath("Tests.xml");
                 if (!String.IsNullOrEmpty(filename))
                 {
+                    path = fullPath;
                     WriteConsole("Document '" + filename + "' Loaded \n");
                 }
             }
+            catch
+            {
+                WriteConsole("File Tests.xml not found");
+            }
         }
-
+        
         private void button1_Click(object sender, EventArgs e)
         {
             XmlDocument xml = new XmlDocument();
@@ -247,66 +241,47 @@ namespace TestsRunner
         
         private void button3_Click(object sender, EventArgs e)
         {
-            string xmlPath = @"Project\Documents\Tests.xml";
+            string xmlPath = @"SeleniumTests\Documents\Tests.xml";
 
-            if (button3.Text.Equals("Run Tests"))
+            foreach (XmlNode xmln in xnList)
             {
-                WriteConsole("Starting automation cases");
-                RunTests();
-                WriteConsole("Finish");
-                button3.Text = "Copy Project and create XML";
+                foreach (string item in selectedCases)
+                {
+                    if (xmln["Name"].InnerText.Equals(item))
+                    {
+                        nodes.Add(xmln);
+                    }
+                }
             }
-            else
+
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlNode testsNode = xmlDoc.CreateElement("Tests");
+            xmlDoc.AppendChild(testsNode);
+            XmlNode readyToRunNode = xmlDoc.CreateElement("readyToRun");
+            testsNode.AppendChild(readyToRunNode);
+            foreach (XmlNode xmln in nodes)
             {
-                foreach (XmlNode xmln in xnList)
+                try
                 {
-                    foreach (string item in selectedCases)
-                    {
-                        if (xmln["Name"].InnerText.Equals(item))
-                        {
-                            nodes.Add(xmln);
-                        }
-                    }
+                    XmlNode import = xmlDoc.ImportNode(xmln, true);
+                    readyToRunNode.AppendChild(import);
+                }
+                catch (Exception ex)
+                {
+                    WriteConsole("Exception orccured while importing the xml nodes : " + ex.Message + "\n");
                 }
 
-                XmlDocument xmlDoc = new XmlDocument();
-                XmlNode testsNode = xmlDoc.CreateElement("Tests");
-                xmlDoc.AppendChild(testsNode);
-                XmlNode readyToRunNode = xmlDoc.CreateElement("readyToRun");
-                testsNode.AppendChild(readyToRunNode);
-                foreach (XmlNode xmln in nodes)
-                {
-                    try
-                    {
-                        XmlNode import = xmlDoc.ImportNode(xmln, true);
-                        readyToRunNode.AppendChild(import);
-                    }
-                    catch (Exception ex)
-                    {
-                        WriteConsole("Exception orccured while importing the xml nodes : " + ex.Message + "\n");
-                    }
-
-                }
-                
-                Copy();
-                if (File.Exists(xmlPath))
-                {
-                    File.Delete(xmlPath);
-                }
-                xmlDoc.Save(xmlPath);
-                WriteConsole("New document created \n");
-
-                a.Content = null;
-                stackPanel.Children.Clear();
-                selectedCases.Clear();
-                path = "";
-                list.Clear();
-                label1.Text = "";
-                treeV.Items.Clear();
-                nodes.Clear();
-
-                button3.Text = "Run Tests";
             }
+            if (File.Exists(xmlPath))
+            {
+                File.Delete(xmlPath);
+            }
+            xmlDoc.Save(xmlPath);
+            WriteConsole("New Tests.xml document created \n");
+
+            WriteConsole("Starting automation cases");
+            RunTests();
+            WriteConsole("Finish");
         }
 
         public void RunTests()
@@ -314,7 +289,7 @@ namespace TestsRunner
             string exePath = null;
             try
             {
-                foreach (string command in Directory.GetFiles("Project", "SeleniumTest.exe"))
+                foreach (string command in Directory.GetFiles("SeleniumTests", "SeleniumTest.exe"))
                 {
                     exePath = command;
                 }
@@ -332,33 +307,7 @@ namespace TestsRunner
                 }
             }
         }
-
-        public void Copy()
-        {
-            if (Directory.Exists("Project"))
-            {
-                Directory.Delete("Project", true);
-            }
-            System.Windows.Forms.MessageBox.Show("Select Selenium Tests Bin/Release or Bin/Deubg folder!");
-            FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.ShowDialog();
-            string path = dlg.SelectedPath;
-
-            DirectoryInfo dest = Directory.CreateDirectory("Project");
-            DirectoryInfo source = new DirectoryInfo(path);
-            copyAll(source,dest);
-        }
-
-        public void copyAll(DirectoryInfo source, DirectoryInfo target)
-        {
-            WriteConsole("Starting copy of the directory");
-            foreach (DirectoryInfo dir in source.GetDirectories())
-                copyAll(dir, target.CreateSubdirectory(dir.Name));
-            foreach (FileInfo file in source.GetFiles())
-                file.CopyTo(Path.Combine(target.FullName, file.Name));
-            WriteConsole("Directory copied");
-        }
-
+        
         public void WriteConsole(string text)
         {
             textBox2.AppendText(text + "\n");
