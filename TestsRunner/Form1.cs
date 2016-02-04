@@ -170,6 +170,10 @@ namespace TestsRunner
 
         private void selectCases(object sender, RoutedEventArgs e)
         {
+            if (selectedCases.Count > 0)
+            {
+                selectedCases.Clear();
+            }
             stackPanel.Children.RemoveAt(stackPanel.Children.Count - 1);
             stackPanel.Children.RemoveAt(stackPanel.Children.Count - 1);
 
@@ -195,9 +199,7 @@ namespace TestsRunner
             a.Close();
             a.Content = null;
             stackPanel.Children.Clear();
-            path = "";
             list.Clear();
-            label1.Text = "";
             treeV.Items.Clear();
             nodes.Clear();
         }
@@ -208,9 +210,7 @@ namespace TestsRunner
             a.Close();
             a.Content = null;
             stackPanel.Children.Clear();
-            path = "";
             list.Clear();
-            label1.Text = "";
             treeV.Items.Clear();
             nodes.Clear();
             selectedCases.Clear();
@@ -219,24 +219,13 @@ namespace TestsRunner
 
         private void button4_Click(object sender, EventArgs e)
         {
-            if (!String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(label1.Text))
+            if (selectedCases.Count > 0)
             {
-                win.Close();
-                a.Close();
-                a.Content = null;
-                stackPanel.Children.Clear();
-                path = "";
-                list.Clear();
-                label1.Text = "";
-                treeV.Items.Clear();
-                nodes.Clear();
+                int count = selectedCases.Count;
                 selectedCases.Clear();
-                WriteConsole("Path cleared \n");
+                WriteConsole(count + " Cases cleared from list");
             }
-            else
-            {
-                WriteConsole("Path already cleared \n");
-            }
+            button3.Enabled = false;
         }
         
         private void button3_Click(object sender, EventArgs e)
