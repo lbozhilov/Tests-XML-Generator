@@ -113,13 +113,16 @@ namespace TestsRunner
 
             var selectBtn = new System.Windows.Controls.Button { Content = "Select" };
             System.Windows.Controls.Button closeBtn = new System.Windows.Controls.Button { Name = "closeBtn", Content = "Close" };
+            var selectAll = new System.Windows.Controls.Button { Content = "Select All" };
             stackPanel.Children.Add(treeV);
             stackPanel.Children.Add(selectBtn);
             stackPanel.Children.Add(closeBtn);
+            stackPanel.Children.Add(selectAll);
             scrollView.Content = stackPanel;
             a.Content = scrollView;
             closeBtn.Click += new RoutedEventHandler(onClosing);
             selectBtn.Click += new RoutedEventHandler(selectCases);
+            selectAll.Click += new RoutedEventHandler(selectAllCases);
             return a;
         }
 
@@ -176,6 +179,7 @@ namespace TestsRunner
             }
             stackPanel.Children.RemoveAt(stackPanel.Children.Count - 1);
             stackPanel.Children.RemoveAt(stackPanel.Children.Count - 1);
+            stackPanel.Children.RemoveAt(stackPanel.Children.Count - 1);
 
             foreach (TreeViewItem item in treeV.Items)
             {
@@ -187,6 +191,29 @@ namespace TestsRunner
                     }
                 }
                 
+            }
+            WriteConsole(selectedCases.Count + " Cases Added for Running \n");
+            CloseWindow();
+            button3.Enabled = true;
+        }
+
+        private void selectAllCases(object sender, RoutedEventArgs e)
+        {
+            if (selectedCases.Count > 0)
+            {
+                selectedCases.Clear();
+            }
+            stackPanel.Children.RemoveAt(stackPanel.Children.Count - 1);
+            stackPanel.Children.RemoveAt(stackPanel.Children.Count - 1);
+            stackPanel.Children.RemoveAt(stackPanel.Children.Count - 1);
+
+            foreach (TreeViewItem item in treeV.Items)
+            {
+                foreach (System.Windows.Controls.CheckBox chb in item.Items)
+                {
+                    selectedCases.Add(chb.Content.ToString());
+                }
+
             }
             WriteConsole(selectedCases.Count + " Cases Added for Running \n");
             CloseWindow();
@@ -269,6 +296,15 @@ namespace TestsRunner
             WriteConsole("New Tests.xml document created \n");
 
             WriteConsole("Starting automation cases");
+
+            if (selectedCases.Count > 0)
+            {
+                int count = selectedCases.Count;
+                selectedCases.Clear();
+                WriteConsole(count + " Cases cleared from list");
+            }
+            button3.Enabled = false;
+
             RunTests();
             WriteConsole("Finish");
         }
@@ -293,6 +329,14 @@ namespace TestsRunner
                 using (Process process = Process.Start(exePath,"Firefox 1 5"))
                 {
                     process.WaitForExit();
+                    if (process.ExitCode > 0)
+                    {
+                        WriteConsole("Tests failed! Please check log.txt file in TestsRunner folder");
+                    }
+                    else
+                    {
+                        WriteConsole("Tests finished Successfully!");
+                    }
                 }
             }
         }
