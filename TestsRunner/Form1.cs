@@ -113,16 +113,17 @@ namespace TestsRunner
         public Window Window2(string path, Dictionary<string[], string> list)
         {
             a = new Window();
-            stackPanel = new StackPanel { Orientation = System.Windows.Controls.Orientation.Vertical };
-            scrollView = new ScrollViewer { HorizontalScrollBarVisibility = ScrollBarVisibility.Auto };
+            stackPanel = new StackPanel { Orientation = System.Windows.Controls.Orientation.Vertical,CanVerticallyScroll = true };
+            scrollView = new ScrollViewer { HorizontalScrollBarVisibility = ScrollBarVisibility.Auto};
             a.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             a.WindowStyle = WindowStyle.None;
             a.Height = 700;
             a.Width = 500;
             a.Title = path;
             a.ResizeMode = ResizeMode.NoResize;
+            
             treeV = new System.Windows.Controls.TreeView { Name = "Tests" };
-
+            
             List<TreeViewItem> ltv = new List<TreeViewItem>();
             List<string> containsE = new List<string>();
 
@@ -167,6 +168,7 @@ namespace TestsRunner
         private void Itm_Selected(object sender, RoutedEventArgs e)
         {
             TreeViewItem items = sender as TreeViewItem;
+            items.IsExpanded = true;
             foreach (System.Windows.Controls.CheckBox item in items.Items)
             {
                 if (item.IsChecked.Equals(false))
