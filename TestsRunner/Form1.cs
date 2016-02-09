@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -13,6 +14,7 @@ namespace TestsRunner
     public partial class Form1 : Form
     {
         private string path = "";
+        private string selConfPath = "";
         public StackPanel stackPanel;
         System.Windows.Controls.TreeView treeV;
         public ScrollViewer scrollView;
@@ -23,7 +25,7 @@ namespace TestsRunner
         List<XmlNode> nodes = new List<XmlNode>();
         Window win = null;
         Dictionary <string[],string> list = new Dictionary<string[],string>();
-        
+        Configuration _userConfig;
 
         public Form1()
         {
@@ -42,6 +44,40 @@ namespace TestsRunner
             {
                 WriteConsole("File Tests.xml not found");
             }
+
+            try
+            {
+                
+                string selConfig = Path.GetFileName(@"SeleniumTests\SeleniumTest.exe.config");
+                string selConfFullPath = Path.GetFullPath(@"SeleniumTests\SeleniumTest.exe.config");
+                if (!String.IsNullOrEmpty(selConfig))
+                {
+                    selConfPath = selConfFullPath;
+                }
+
+                
+                string configFilePath = selConfPath;
+                
+                ExeConfigurationFileMap configFileMap = new ExeConfigurationFileMap();
+                configFileMap.ExeConfigFilename = configFilePath;
+                _userConfig = ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
+
+                //foreach (string key in _userConfig.AppSettings.Settings.AllKeys)
+                //{
+                //    WriteConsole(string.Format("Key: {0}, Value: {1}", key, _userConfig.AppSettings.Settings[key].Value));
+                //}
+            }
+            catch
+            {
+                WriteConsole("Selenium Tests config not found");
+            }
+            
+
+            //string QAurl = "http://qa.rapidlegal.legalconnect.com/";
+            //comboBox1.Items.Add(QAurl);
+            //string CIurl = "http://ci.rapidlegal.legalconnect.com/";
+            //comboBox1.Items.Add(CIurl);
+            
         }
         
         private void button1_Click(object sender, EventArgs e)
@@ -96,6 +132,7 @@ namespace TestsRunner
                 {
                     containsE.Add(item.Value);
                     TreeViewItem itm = new TreeViewItem();
+                    //itm.Header = item.Value;
                     itm.Header = item.Value;
                     ltv.Add(itm);
                 }
@@ -103,6 +140,7 @@ namespace TestsRunner
 
             foreach (TreeViewItem im in ltv)
             {
+                im.Selected += Itm_Selected;
                 treeV.Items.Add(im);
             }
 
@@ -124,6 +162,22 @@ namespace TestsRunner
             selectBtn.Click += new RoutedEventHandler(selectCases);
             selectAll.Click += new RoutedEventHandler(selectAllCases);
             return a;
+        }
+
+        private void Itm_Selected(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem items = sender as TreeViewItem;
+            foreach (System.Windows.Controls.CheckBox item in items.Items)
+            {
+                if (item.IsChecked.Equals(false))
+                {
+                    item.IsChecked = true;
+                }
+                else
+                {
+                    item.IsChecked = false;   
+                }
+            }
         }
 
         public void insertItems(KeyValuePair<string[], string> item, System.Windows.Controls.TreeView trev)
@@ -270,6 +324,31 @@ namespace TestsRunner
                 }
             }
 
+            //if (!comboBox1.Text.Equals(String.Empty) && !comboBox1.Text.Equals("Select Server"))
+            //{
+            //    if (comboBox1.Text.Contains("ci"))
+            //    {
+            //        _userConfig.AppSettings.Settings["BaseURL"].Value = comboBox1.Text;
+            //        _userConfig.ConnectionStrings.ConnectionStrings["RapidLegalConnectionString"].ConnectionString = "Data Source=dev.db.rapidlegal.com;Initial Catalog=RapidLegal_Dev;Persist Security Info=True;User ID=sofia;Password=s0fia";
+            //        _userConfig.ConnectionStrings.ConnectionStrings["RapidLegalConnectionString"].ProviderName = "System.Data.SqlClient;";
+            //        _userConfig.Save();
+            //    }
+            //    else
+            //    {
+            //        _userConfig.AppSettings.Settings["BaseURL"].Value = comboBox1.Text;
+            //        _userConfig.ConnectionStrings.ConnectionStrings["RapidLegalConnectionString"].ConnectionString = "Data Source=dev.db.legalconnect.com;Initial Catalog=RapidLegal_QA;Persist Security Info=True;User ID=rluser;Password=rapid1199";
+            //        _userConfig.ConnectionStrings.ConnectionStrings["RapidLegalConnectionString"].ProviderName = "System.Data.SqlClient;";
+            //        _userConfig.Save();
+            //    }
+            //}
+            //else
+            //{
+            //    _userConfig.AppSettings.Settings["BaseURL"].Value = "http://qa.rapidlegal.legalconnect.com/";
+            //    _userConfig.ConnectionStrings.ConnectionStrings["RapidLegalConnectionString"].ConnectionString = "Data Source=dev.db.legalconnect.com;Initial Catalog=RapidLegal_QA;Persist Security Info=True;User ID=rluser;Password=rapid1199";
+            //    _userConfig.ConnectionStrings.ConnectionStrings["RapidLegalConnectionString"].ProviderName = "System.Data.SqlClient;";
+            //    _userConfig.Save();
+            //}
+            
             XmlDocument xmlDoc = new XmlDocument();
             XmlNode testsNode = xmlDoc.CreateElement("Tests");
             xmlDoc.AppendChild(testsNode);
@@ -345,5 +424,6 @@ namespace TestsRunner
         {
             textBox2.AppendText(text + "\n");
         }
+
     }
 }

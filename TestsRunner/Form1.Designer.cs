@@ -1,4 +1,6 @@
-﻿namespace TestsRunner
+﻿using System.Windows.Forms;
+
+namespace TestsRunner
 {
     partial class Form1
     {
@@ -32,6 +34,8 @@
             this.button1 = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button4 = new System.Windows.Forms.Button();
+            //this.comboBox1 = new System.Windows.Forms.ComboBox();
+            //this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button3
@@ -58,13 +62,13 @@
             // textBox2
             // 
             this.textBox2.AcceptsReturn = true;
-            this.textBox2.Location = new System.Drawing.Point(12, 67);
+            this.textBox2.Location = new System.Drawing.Point(12, 108);
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
             this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.textBox2.ShortcutsEnabled = false;
-            this.textBox2.Size = new System.Drawing.Size(296, 214);
+            this.textBox2.Size = new System.Drawing.Size(295, 248);
             this.textBox2.TabIndex = 5;
             // 
             // button4
@@ -76,12 +80,32 @@
             this.button4.Text = "Clear Selected Cases";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            //// 
+            //// comboBox1
+            //// 
+            //this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            //this.comboBox1.FormattingEnabled = true;
+            //this.comboBox1.Location = new System.Drawing.Point(89, 70);
+            //this.comboBox1.Name = "comboBox1";
+            //this.comboBox1.Size = new System.Drawing.Size(218, 21);
+            //this.comboBox1.TabIndex = 8;
+            //// 
+            //// label1
+            //// 
+            //this.label1.AutoSize = true;
+            //this.label1.Location = new System.Drawing.Point(12, 75);
+            //this.label1.Name = "label1";
+            //this.label1.Size = new System.Drawing.Size(71, 13);
+            //this.label1.TabIndex = 9;
+            //this.label1.Text = "Select Server";
             // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(320, 291);
+            this.ClientSize = new System.Drawing.Size(320, 373);
+            //this.Controls.Add(this.label1);
+            //this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.button1);
@@ -99,6 +123,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button button4;
+        //private System.Windows.Forms.ComboBox comboBox1;
+        //private Label label1;
     }
 }
 
